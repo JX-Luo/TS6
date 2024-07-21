@@ -1,6 +1,6 @@
 # TS6
 The TS6.py file contains functions that will be frequently used when doing experiments on TS6,   
-such to plot $\psi$(currently the only useful function).
+such to plot $\psi$(currently the only useful function).   
 
 # Pre-request
 * numpy
@@ -57,8 +57,6 @@ for example:
 ```
 will return you the $\psi$ at 460 $\mu s$ in shot20 of 240619.
 
+If there is any bugs, please raise an issue and I will try my best to fix them if I pass my entrance exam!!!
 
 Have fun!!!!!!
-
-
-
