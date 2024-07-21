@@ -43,8 +43,11 @@ I created a google spreadsheet [here](https://docs.google.com/spreadsheets/d/1iz
 if we update the calibration sheet in the above link, and run the following, the function should be able to see the difference.   
 (I have not tested yet, because I failed to do any experiment after I finished this)   
 ```
->>>ts6.psi_plot(240619, 20, renewal='both') #'both' means to update the experiment log and calibariton sheet at the same time
-```   
+>>>ts6.psi_plot(240619, 20, renewal='both') 
+```
+here ```renewal='both'``` tells the function to read both experiment log and calibration log at the same time.
+if you just renew the calibration log, change it to ```renewal='cali'```
+
 
 By default, the TS6 module use the 'Latest' sheet, but if we want to use another sheet, run:
 ```
