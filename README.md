@@ -45,8 +45,8 @@ if we update the calibration sheet in the above link, and run the following, the
 ```
 >>>ts6.psi_plot(240619, 20, renewal='both') 
 ```
-here ```renewal='both'``` tells the function to renew both experiment log and calibration log at the same time.
-if you just renew the calibration log, change it to ```renewal='cali'```
+here ```renewal='both'``` tells the function to renew both experiment log and calibration log at the same time.    
+if you just want to renew the calibration log, change it to ```renewal='cali'```
 
 
 By default, the TS6 module use the 'Latest' sheet, but if we want to use another sheet, run:
