@@ -20,7 +20,7 @@ Just download the TS6.py file, place it in any directory you like.
 
 # Quick start
 Simply download the TS6.py file, place it in any directory you like,    
-open the terminal, type in python, and run 
+open the terminal, go the directory where you placed TS6.py, type in python, and run 
 ```
 ~$python
 >>>import TS6 as ts6
