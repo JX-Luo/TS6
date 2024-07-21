@@ -50,7 +50,7 @@ here the ```date``` is the sheet name.
 # For more general usage....
 As a not very useful module... currently the only useful function is ```psi_plot```    
 But if you want to continue developing this module, (which is so much appreciated!!!)    
-```psi_at_t(date, shot_in_the_date, m)``` should return you the derived $\psi$ from $B_z$ at $m\mu s$    
+```psi_at_t(date, shot_in_the_date, m)``` should return you the derived $\psi$ from $B_z$ at $t=m\mu s$    
 for example:
 ```
 >>>psi_at_t(240619, 20, 460)
