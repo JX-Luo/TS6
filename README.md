@@ -44,16 +44,16 @@ By default, the TS6 module use the 'Latest' sheet, but if we want to use another
 ```
 >>>ts6.set_cali_date(date)
 ```
-here the ```date``` is the sheet name.
+here  ```date``` is the sheet name.
 
 
 # For more general usage....
 As a not very useful module... currently the only useful function is ```psi_plot```    
 But if you want to continue developing this module, (which is so much appreciated!!!)    
-```psi_at_t(date, shot_in_the_date, m)``` should return you the derived $\psi$ from $B_z$ at $t=m$ in microseconds $\mus$    
+```psi_at_t(date, shot_in_the_date, m)``` should return you the derived $\psi$ from $B_z$ at $t=m$ in microseconds $\mu s$    
 for example:
 ```
->>>psi_at_t(240619, 20, 460)
+>>>ts6.psi_at_t(240619, 20, 460)
 ```
 will return you the $\psi$ at 460 $\mu s$ in shot20 of 240619.
 
