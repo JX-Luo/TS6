@@ -33,15 +33,18 @@ As the only useful function up to date, to plot $\psi$, simply run the following
 here ```date``` and ```shot_in_the_date``` are the "date" and "shot" as we recorded in the TS-6 log. (Not the digitizer shot!!!)   
 For example:
 ```
->>>ts6.psi_plot(240619, 20, renewal='exp')
+>>>ts6.psi_plot(240619, 20, renewal='both')
 ```
 ```renewal='exp'``` tells the function to read our TS-6 log online.   
 Oh yeah!!! If the above ```psi_plot``` function succeeded, it would save the rawdata into the ```./240619/shot20.csv``` file.
 
 During the experiments, there may be newly dead channels and we update the calibration sheet.   
 I created a google spreadsheet [here](https://docs.google.com/spreadsheets/d/1izM2mY1kjGAxIqMIXwhyzw1iuuMF3k5VXFJqi9Sy2U4/edit?pli=1&gid=1603179474#gid=1603179474),    
-if we update the calibration sheet in the above link, the function should be able to see the difference.   
+if we update the calibration sheet in the above link, and run the following, the function should be able to see the difference.   
 (I have not tested yet, because I failed to do any experiment after I finished this)   
+```
+>>>ts6.psi_plot(240619, 20, renewal='both') #'both' means to update the experiment log and calibariton sheet at the same time
+```   
 
 By default, the TS6 module use the 'Latest' sheet, but if we want to use another sheet, run:
 ```
