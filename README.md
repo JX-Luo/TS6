@@ -45,7 +45,7 @@ if we update the calibration sheet in the above link, and run the following, the
 ```
 >>>ts6.psi_plot(240619, 20, renewal='both') 
 ```
-here ```renewal='both'``` tells the function to read both experiment log and calibration log at the same time.
+here ```renewal='both'``` tells the function to renew both experiment log and calibration log at the same time.
 if you just renew the calibration log, change it to ```renewal='cali'```
 
 
