@@ -33,7 +33,7 @@ As the only useful function up to date, to plot $\psi$, simply run the following
 here ```date``` and ```shot_in_the_date``` are the "date" and "shot" as we recorded in the TS-6 log. (Not the digitizer shot!!!)   
 For example:
 ```
->>>ts6.psi_plot(240619, 20, renewal='both')
+>>>ts6.psi_plot(240619, 20, renewal='exp')
 ```
 ```renewal='exp'``` tells the function to read our TS-6 log online.   
 Oh yeah!!! If the above ```psi_plot``` function succeeded, it would save the rawdata into the ```./240619/shot20.csv``` file.
