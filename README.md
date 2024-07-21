@@ -41,7 +41,7 @@ Oh yeah!!! If the above ```psi_plot``` function succeeded, it would save the raw
 During the experiments, there may be newly dead channels and we update the calibration sheet.   
 I created a google spreadsheet [here](https://docs.google.com/spreadsheets/d/1izM2mY1kjGAxIqMIXwhyzw1iuuMF3k5VXFJqi9Sy2U4/edit?pli=1&gid=1603179474#gid=1603179474),    
 if we update the calibration sheet in the above link, the function should be able to see the difference.   
-(I have not tested yet, because I didn't make it to do any experiment after I finished this)   
+(I have not tested yet, because I failed to do any experiment after I finished this)   
 
 By default, the TS6 module use the 'Latest' sheet, but if we want to use another sheet, run:
 ```
