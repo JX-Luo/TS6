@@ -15,8 +15,11 @@ Installing MDSplus can be actually kind of bothersome. (面倒くさいな…)
 I tried my best to write down how to install the MDSplus module for python on our TS-group wiki's [MDSplus page](http://tanuki.t.u-tokyo.ac.jp/wiki/index.php/MDSplus).  
 That should both work on Mac and Windows Subsystem Linux.
 
+# How to install
+Just download the TS6.py file, place it in any directory you like.
+
 # Quick start
-Simply download the file, place it in any directory you like,    
+Simply download the TS6.py file, place it in any directory you like,    
 open the terminal, type in python, and run 
 ```
 ~$python
