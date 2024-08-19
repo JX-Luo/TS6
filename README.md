@@ -26,22 +26,22 @@ To plot $\psi$ during the merging, as is the only useful function in this module
 >>>ts6.psi_plot(date, shot_in_the_date, renewal='exp')
 ```
 
-Here ```renewal='exp'``` tells the function to read our TS-6 experiment log online. The input variables ```date``` and ```shot_in_the_date``` are the "date" and "shot" that we recorded in the TS-6 experiment log (note the shot is not the digitizer shot!!!). For example,
+Here ```renewal='exp'``` tells the function to read our TS-6 experiment log online. The input variables ```date``` and ```shot_in_the_date``` are the date and shot number within the date that we recorded in the TS-6 experiment log (note "shot_in_the_date" is not the digitizer shot number!!!). For example,
 ```
 >>>ts6.psi_plot(240619, 20, renewal='exp')
 ```
 
 
-Oh yeah!!! If the above ```psi_plot``` function succeeded, it would save the rawdata into the ```./240619/shot20.csv``` file.
+Oh yeah!!! If succeeded, the function would save the rawdata into the ```./240619/shot20.csv```.
 
-During the experiments, there may be newly dead channels and we update the calibration sheet. I created a google spreadsheet [here](https://docs.google.com/spreadsheets/d/1izM2mY1kjGAxIqMIXwhyzw1iuuMF3k5VXFJqi9Sy2U4/edit?pli=1&gid=1603179474#gid=1603179474). If we update the calibration sheet in the above link, run the following code, the function should be able to see the difference (sorry I have not tested yet, because I failed to do any experiment since I finished this code).   
+During the experiments, there may be newly dead channels and we update the calibration sheet. I created a google spreadsheet [here](https://docs.google.com/spreadsheets/d/1izM2mY1kjGAxIqMIXwhyzw1iuuMF3k5VXFJqi9Sy2U4/edit?pli=1&gid=1603179474#gid=1603179474). If we update the calibration sheet in this link and run the following code, the function should be able to see the difference (sorry I have not tested yet, because I failed to do any experiment since I finished this code).   
 ```
 >>>ts6.psi_plot(240619, 20, renewal='both') 
 ```
-Here ```renewal='both'``` tells the function to renew both experiment log and calibration log at the same time. If you just want to renew the calibration log, change it to ```renewal='cali'```
+Here ```renewal='both'``` tells the function to renew both experiment log and calibration log at the same time. If you just want to renew the calibration log, change it to ```renewal='cali'```. Similarly, if you don't want to renew anthing, run ```renewl=None```. 
 
 
-By default, TS6.py uses the 'Latest' sheet. But if we want to use another sheet, run
+By default, TS6.py uses the 'Latest' sheet in the calibration log. But if we want to use another sheet, run
 ```
 >>>ts6.set_cali_date(date)
 ```
