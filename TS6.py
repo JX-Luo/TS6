@@ -311,7 +311,7 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False):
             ax[i, k].contour(CS, levels=CS.levels[1:-1:3], colors='k')
             ax[i, k].set_title(r'%i $\mu s$' %t)
 
-            ax[i, k].plot(np.arange(0, 7) * 25e-3 + 9e-2, np.ones(7) * -2.1e-2, 'x', c='darkred', ms=4)
+            # ax[i, k].plot(np.arange(0, 7) * 25e-3 + 9e-2, np.ones(7) * -2.1e-2, 'x', c='darkred', ms=4)
     
             if k!=0:
                 ax[i, k].tick_params(labelleft=False)
