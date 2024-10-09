@@ -55,6 +55,6 @@ As a not very useful module (...), currently the only useful function is ```psi_
 ```
 will return you the $\psi$ at 460 $\mu s$ in shot20 of 240619.
 
-If there is any bugs, please raise an issue and I will try my best to fix them if I pass my entrance exam!!!
+If there is any bugs, please raise an issue and I will try my best to fix them (without guarantee)
 
 Have fun!!!!!!
