@@ -1,4 +1,4 @@
-# exclude everything except TS6.py
+# exclude everything
 
-README.md
+*.md
 !TS6.py
