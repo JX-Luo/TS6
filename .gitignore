@@ -1,4 +1,4 @@
 # exclude everything, but it is not working...
 
-*
+*.md
 !TS6.py
