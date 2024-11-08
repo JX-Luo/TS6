@@ -284,6 +284,17 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=4
     '''
     this function only takes date and shot in the date as input
     and returns the psi plot
+
+    input:
+    ------
+    date: the date at which the experiment is done
+    shot_in_the_date: the shot number of the experiment within the date
+    save: whether to save the plot. Default value is true.
+    renewal: whether to renew the experiment log or the calibration log. Default is False,
+             accepted values are 'exp', 'cali', and 'both'
+    start: the start time of plotting 
+    stop: the stop time of plotting
+    lvs: the number of levels of the contourf plot of the magnetic lines
     '''
 
     if renewal:
