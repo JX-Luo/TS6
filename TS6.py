@@ -310,7 +310,7 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=4
     fig, ax = plt.subplots(3, 3, figsize=[6, 6])
     fig.subplots_adjust(hspace=0.3)
     
-    levels = np.linspace(-10e-3, 10e-3, lvs)
+    levels = np.linspace(-12e-3, 12e-3, lvs)
     
 
     for idx, t in enumerate(times_to_plot):
@@ -321,7 +321,7 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=4
             ax[i, k].contour(CS, levels=CS.levels[1:-1:3], colors='k')
             ax[i, k].set_title(r'%i $\mu s$' %t)
 
-            ax[i, k].plot(np.arange(0, 7) * 25e-3 + 9e-2, np.ones(7) * 2.1e-2, 'x', c='darkred', ms=4)
+            # ax[i, k].plot(np.arange(0, 7) * 25e-3 + 9e-2, np.ones(7) * 2.1e-2, 'x', c='darkred', ms=4)
     
             if k!=0:
                 ax[i, k].tick_params(labelleft=False)
