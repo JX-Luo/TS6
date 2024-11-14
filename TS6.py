@@ -318,7 +318,7 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=4
         
             i, k = [idx//3, idx%3]
     
-            CS = ax[i, k].contourf(R_interp[:, 1:], Z_interp[:, 1:], psi_at_t(date, shot_in_the_date, t).T, 30, cmap='pink', levels=levels)
+            CS = ax[i, k].contourf(R_interp[:, 1:], Z_interp[:, 1:], psi_at_t(date, shot_in_the_date, t).T, 30, cmap='RdBu', levels=levels)
             ax[i, k].contour(CS, levels=CS.levels[1:-1:3], colors='k')
             ax[i, k].set_title(r'%i $\mu s$' %t)
 
