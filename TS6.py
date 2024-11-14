@@ -280,7 +280,7 @@ def psi_at_t(date, shot_in_the_date, m):
 
 
 
-def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=490, lvs=90):
+def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=490, lvs=90, psi_lim=[-10e-3, 10e-3]):
     '''
     this function only takes date and shot in the date as input
     and returns the psi plot
@@ -309,8 +309,9 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=4
 
     fig, ax = plt.subplots(3, 3, figsize=[6, 6])
     fig.subplots_adjust(hspace=0.3)
-    
-    levels = np.linspace(-12e-3, 12e-3, lvs)
+
+    psi_upper, psi_lower = psi_lim
+    levels = np.linspace(psi_upper, psi_lower, lvs)
     
 
     for idx, t in enumerate(times_to_plot):
