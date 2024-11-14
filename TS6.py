@@ -99,7 +99,7 @@ def read_data(date, shot_in_the_date):
         for i in range(dgt_ch_no):
             rawdata[:, i] = conn.get('AI:CH%03i' %(i+1))
 
-        rawdata = rawdata - rawdata[0, :] # clear out the offset
+        rawdata = rawdata - rawdata[600, :] # clear out the offset
         
     
         rawdata_tf = np.zeros_like(rawdata) # again, to hold the tfshot rawdata. BUT!!! MUST be zeros_like instead of empty here. 
@@ -111,7 +111,7 @@ def read_data(date, shot_in_the_date):
             for i in range(dgt_ch_no):
                 rawdata_tf[:, i] = conn.get('AI:CH%03i' %(i+1))
                 
-            rawdata_tf = rawdata_tf - rawdata_tf[0, :] # clear out the offset
+            rawdata_tf = rawdata_tf - rawdata_tf[600, :] # clear out the offset
 
             rawdata = rawdata - rawdata_tf # the useful, processable data
         
