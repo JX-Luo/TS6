@@ -115,12 +115,16 @@ Theory is straight forward, but engineering is forever imperfect. We always have
 
 4. <b>Interpolation with dead channels</b>     
     Perhaps the biggest hidden / runtime bug in the TS6_0.0 version (which took me around one week to find). As we know that our TS6 magnetic probes pick up magnetic fields on a rectangular grid, which we then use to interpolate a higher resolution meshgrid. Nice and sweet as it sounds, an extremely dirty problem is that, what do we do when there are dead channels?... Can these remaining measured values still be used as a rectangular grid? If not, how do we fix this problem? Do we first interpolate the missing values on the grid, and then use it for high resolution interpolation? Or, do we directly use it as unstructured data?
-    There is no perfect answer. Previously the TS6_0.0 version directly feeds the alive data to a interpolation algorithm. However, this is by default treating the alive channels as unstructured data, and might have imposed great bias on the result until discovered by accident. This problem is still under investigation...
+    There is no perfect answer. Previously the TS6_0.0 version directly feeds the alive data to a interpolation algorithm. However, this is by default treating the alive channels as unstructured data, and might have imposed great bias on the result until discovered by accident.
+   By a lot of try and error, the current version of TS6 use unstructured ```griddata``` method to interpolate the dead channels first and then use rectangular interpolation method ```RegularGridInterpolator``` to interpolate on a finer mesh. However, I want to note that in fact directly use griddate with unstructured data on a fine mesh does not make big difference, but the lines of the former one is more smooth.
 
 6. <b>Interpolation range</b>    
     Perhaps another annoying problem is deciding the interpolation meshgrid. The problem is that we are interpolating $B_z$, but wanting to plot $\psi$, which is the integral of $B_z$ along the $r$ direction. This brings a problem that, if our $B_z$ did not cover the smallest radius as possible, then there must be an systematic bias to $\psi$, as there are some $B_z$ that is not integrated in the inner radius region. However, if we extend our integration area to the inner radius region, the interpolation inherently becomes extrapolation there, bringing new problems to the result.
 
    (However, this occurred to me and should be helpful. Since we never need the absolute value of $\psi$ (all other physical properties derived from $\psi$ is its derivative), and $B$ is almost completely parallel to the $z$ direction in the inner $r$ region (this means that $B_z$ is constant at a $r$ postion as long as $r$ is small enough), we can conclude that the incomplete integration of $B_z$ only causes a constant bias to $\psi$, which never affects the magnetic field line plot, nor the derivative of $\psi$.)
+
+7. <b>Dead channels</b>
+  Finally, I want to note that in this version, there is an additional notebook ploting the channel signals, and there is also a BZ_and_channel_plot inthe TS6 file, so that we can identify the dead channels better.
 
 
 
