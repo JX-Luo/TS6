@@ -59,7 +59,11 @@ If there is any bugs, please raise an issue and I will try my best to fix them (
 
 Have fun!!!!!!
 
-## <b>Overview</b>
+
+------------------------------------
+
+
+# <b>Late Overview</b>
 ### <b>What is this code for? And its principle?</b>
 Two dimonsional magnetic field measurement is necessary for merging experiments (otherwise how do we when know when and where do the plasmas merge?).   
 To do so, on TS6, we use 2D pickup coil arrays. The idea, Faraday's law, is simple: the change of magnetic flux in the coil generates voltage, which can be written as
