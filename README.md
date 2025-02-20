@@ -123,7 +123,7 @@ Theory is straight forward, but engineering is forever imperfect. We always have
 
    (However, this occurred to me and should be helpful. Since we never need the absolute value of $\psi$ (all other physical properties derived from $\psi$ is its derivative), and $B$ is almost completely parallel to the $z$ direction in the inner $r$ region (this means that $B_z$ is constant at a $r$ postion as long as $r$ is small enough), we can conclude that the incomplete integration of $B_z$ only causes a constant bias to $\psi$, which never affects the magnetic field line plot, nor the derivative of $\psi$.)
 
-7. <b>Dead channels</b>
+7. <b>Dead channels</b>      
   Finally, I want to note that in this version, there is an additional notebook ploting the channel signals, and there is also a BZ_and_channel_plot inthe TS6 file, so that we can identify the dead channels better.
 
 
