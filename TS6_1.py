@@ -10,6 +10,8 @@ import MDSplus as mds
 import scipy.interpolate as interp
 import scipy.integrate as integ
 import scipy.special as sp
+import scipy.constants as const
+from scipy.ndimage import gaussian_filter1d
 
 
 plt.rcParams['mathtext.default'] = 'regular'
@@ -28,9 +30,10 @@ dgt_no = 39 # digitizer number
 dgt_ch_no = dgt_ch_dic[dgt_no] # the number of the digitizer' channels
 
 
-sheet_name_cali = 'latest'
+sheet_name_cali = '250214'
 sheet_id_cali = '1izM2mY1kjGAxIqMIXwhyzw1iuuMF3k5VXFJqi9Sy2U4'
 url_cali = f'https://docs.google.com/spreadsheets/d/%s/gviz/tq?tqx=out:csv&sheet=%s' %(sheet_id_cali, sheet_name_cali)
+print('the current calibration sheet is %s. \nSelecting a more appropriate date for you is recommended.\nRun set_cali_date(date).' %sheet_name_cali)
 
 
 cali_data = pd.read_csv(url_cali) # the calibration file.
@@ -38,12 +41,18 @@ cali_data['dtacq_num'] = cali_data['dtacq_num'].ffill() #filling the missing dat
 
 
 R_EF = 0.5
-mu = 4e-7 * np.pi
 n_EF = 234
 
 
 Z_EF1 = 0.78 # the position of the equilibrium coils
 Z_EF2 = -0.78 
+
+
+offset_start = 0
+offset_stop = 10
+
+# the standard deviation for signal smoothing
+sigma = 0.12
 
 
 
@@ -72,60 +81,115 @@ def read_parameter(date, shot_in_the_date):
 
 
 
-def read_data(date, shot_in_the_date):
+def read_data(shot):
     '''
-    this function returns the rawdate which was taken in 'date', with a shot number 'shot_in_the_date'
+    this function reads the probe data.
+    It will first try to open up a local csv file first,
+    if that fails, then try to connect to fourier, read data and save it.
+    The default directory for the above behavior would be in the ./dgt_shot/ directory
     '''
-
-    shot, tfshot, I_EF, TF_voltage = read_parameter(date, shot_in_the_date)
-
+    
     try:
         
-        rawdata = np.genfromtxt('./%s/shot%s.csv' %(date, shot_in_the_date), delimiter=',')
+        rawdata = np.genfromtxt('./dgt_shot/shot%s.csv' %(shot), delimiter=',')
 
-        print('using local file.')
+        # print('using local file.')
         
     except FileNotFoundError:
 
-
         
-        conn = mds.Connection('192.168.1.140')
-        
-        
+        # connect to mdsplus server
+        conn = mds.Connection('192.168.1.140')     
 
         rawdata = np.empty([1000, dgt_ch_no]) # rawdata is to hold the data that is originally stored in Fourier
         
-        conn.openTree('a%03i' %dgt_no, shot) # loading the shot data
+        conn.openTree('a%03i' %dgt_no, shot) # opening tree for shot data
         for i in range(dgt_ch_no):
             rawdata[:, i] = conn.get('AI:CH%03i' %(i+1))
 
-        rawdata = rawdata - rawdata[0, :] # clear out the offset
         
-    
-        rawdata_tf = np.zeros_like(rawdata) # again, to hold the tfshot rawdata. BUT!!! MUST be zeros_like instead of empty here. because there maybe no TF current
-        
-        if tfshot != 0:
-
-            conn.openTree('a%03i' %dgt_no, tfshot) # loading the tfshot data
-            for i in range(dgt_ch_no):
-                rawdata_tf[:, i] = conn.get('AI:CH%03i' %(i+1))
-            rawdata_tf = rawdata_tf - rawdata_tf[0, :] # clear out the offset
-
-            rawdata = rawdata - rawdata_tf # the useful, processable data
-        
-        
-        
+        # save the data to local directory
         try:
-            np.savetxt('./%s/shot%s.csv' %(date, shot_in_the_date), rawdata, delimiter=',')
+            np.savetxt('./dgt_shot/shot%s.csv' %(shot), rawdata, delimiter=',')
         except FileNotFoundError:
-            os.mkdir('./%s' %date)
-            np.savetxt('./%s/shot%s.csv' %(date, shot_in_the_date), rawdata, delimiter=',')
+            os.mkdir('./dgt_shot')
+            np.savetxt('./dgt_shot/shot%s.csv' %(shot), rawdata, delimiter=',')
 
+        
         print('using online file. new local file saved.')
 
+    return rawdata # notice the indent here...
 
+
+
+
+
+def read_tree_data(shot):
+    '''
+    this function retrieves data from a tree either from a local directory.
+    default is online.
+
+    the input is the digitizer shot number. 
+    if the (date, shot_in_the_date) pattern is preferred, look for help of read_parameter(date, shot_in_the_date)
+    '''
+
+    tree_data = np.zeros([1000, dgt_ch_no])
     
-    return rawdata #notice the indent here...
+    tree = mds.Tree('a%03i' %dgt_no, shot)
+
+    for i in range(dgt_ch_no):
+        tree_data[:, i] = tree.getNode('AI:CH%03i' %(i+1)).getData().data()
+
+    try:
+        np.savetxt('./dgt_shot/shot%s.csv' %(shot), rawdata, delimiter=',')
+    except FileNotFoundError:
+        os.mkdir('./dgt_shot')
+        np.savetxt('./dgt_shot/shot%s.csv' %(shot), rawdata, delimiter=',')
+
+    print('Reading local tree. New local file saved.')
+
+
+
+
+
+def tf_clearing(shot, tf_shot):
+    '''
+    this function clears out the tfshot
+    '''
+    
+    rawdata = read_data(shot)
+    # rawdata = offset_clearing(rawdata)
+
+    if tf_shot != 0:
+        rawdata_tf = read_data(tf_shot)
+        # # rawdata_tf = offset_clearing(rawdata_tf)
+        rawdata = rawdata - rawdata_tf
+
+    return rawdata
+
+
+
+
+
+def offset_clearing(rawdata):
+    '''
+    this function clears out the offset
+    '''
+    
+    rawdata = rawdata - rawdata[offset_start:offset_stop, :].mean(axis=0)
+
+    return rawdata
+
+
+
+
+
+def noise_smoothing(rawdata):
+    '''
+    this function smooth out the noise of each probe using gaussian filtering.
+    note that the choice of sigma depends heavily on trial and error.
+    '''
+    return gaussian_filter1d(rawdata, sigma)
 
 
 
@@ -136,7 +200,13 @@ def rawdata_calibration(date, shot_in_the_date):
     this function reads the rawdata, calibrat it, and return the calibrated one.
     '''
 
-    rawdata = read_data(date, shot_in_the_date)
+    shot, tfshot, I_EF, TF_voltage = read_parameter(date, shot_in_the_date)
+
+    rawdata = tf_clearing(shot, tfshot)
+
+    rawdata = offset_clearing(rawdata)
+
+    rawdata = noise_smoothing(rawdata)
     
     # take out the calibration data where digitizer is 39, ok is not 0 and direction is z
     cali_data_alivez = cali_data.query('dtacq_num==%s and ok!=0 and direction=="z"' %dgt_no)
@@ -178,8 +248,8 @@ def RZ_range():
     r_position, z_position = RZ_coordinate()
 
     
-    r_interp = np.linspace(r_position.min(), r_position.max(), 40) # interpolation, for further integration
-    z_interp = np.linspace(z_position.min(), z_position.max(), 50)
+    r_interp = np.linspace(r_position.min(), r_position.max(), 80) # interpolation, for further integration
+    z_interp = np.linspace(z_position.min(), z_position.max(), 90)
 
     return r_interp, z_interp
 
@@ -187,6 +257,28 @@ def RZ_range():
 
 
 
+def RZ_points():
+    '''
+    This function gets all the measuring points of Bz.
+    The previous RZ_coordinate() returns only the alive ones.
+    The naming is due to historical issue.
+    Don't confuse them.
+
+    the returned value is in increasing order
+    '''
+
+    cali_data_z = cali_data.query('dtacq_num==39 and direction=="z"')
+
+
+    z = np.sort(cali_data_z['zpos'].unique())
+    r = np.sort(cali_data_z['rpos'].unique())
+
+    return r, z
+
+
+
+
+    
 def Bz_interp_at_t(date, shot_in_the_date, m):
     '''
     this function interpolate the mearsured Bz and return the interpolated value.
@@ -194,13 +286,27 @@ def Bz_interp_at_t(date, shot_in_the_date, m):
     
     rawdata_alive = rawdata_calibration(date, shot_in_the_date)
 
-    r_position, z_position = RZ_coordinate()
+    # interpolate the dead channels
+    # first is to get the alive channels' coordinates
+    r_position, z_position = RZ_coordinate()    
+    rz_points = np.column_stack([r_position, z_position])
 
-    r_interp, z_interp = RZ_range()
+    # the complete measuring points
+    r, z = RZ_points()
+    r_grid, z_grid = np.meshgrid(r, z)
+
+    # interpolate the dead channels
+    Bz_on_points = interp.griddata(rz_points, rawdata_alive[m, :], (r_grid, z_grid), fill_value=0, method='linear')
     
-    tck = interp.bisplrep(r_position, z_position, rawdata_alive[m, :])
 
-    return interp.bisplev(r_interp, z_interp, tck)
+    # interpolate all grid onto a finer mesh
+    # the finer mesh
+    r_interp, z_interp = RZ_range()
+    R, Z = np.meshgrid(r_interp, z_interp)
+
+    rect_interp = interp.RegularGridInterpolator((z, r), Bz_on_points, method='cubic', bounds_error=False, fill_value=0)
+    
+    return rect_interp((Z, R)).T
 
 
 
@@ -225,15 +331,13 @@ def B_EF(date, shot_in_the_date, Z):
 
     r_interp, z_interp = RZ_range()
     
-    z_ef = z_interp[None, :] + Z
+    z_ef = z_interp[None, :] - Z
     r_ef = r_interp[:, None]
 
     k = np.sqrt(4 * R_EF * r_ef / ((R_EF+r_ef)**2 + z_ef ** 2))
     
-    return I * mu  / 2 / (
-                            np.pi * np.sqrt((R_EF+r_ef)**2 + z_ef**2)
-                          ) * (
-                            E(k)*(R_EF**2-r_ef**2-z_ef**2)/((R_EF+r_ef)**2+z_ef**2-4*R_EF*r_ef) + K(k)
+    return I * const.mu_0  / (2 * np.pi) / np.sqrt((R_EF+r_ef)**2 + z_ef**2) * (
+                            E(k**2)*(R_EF**2-r_ef**2-z_ef**2) / ((R_EF+r_ef)**2+z_ef**2-4*R_EF*r_ef) + K(k**2)
                                ) ## forgive me for giving something like this....
                                ## the thing inside the first big parenthesis is the big denomiator
                                ## the thing inside the second big parenthesis is the square brackets
@@ -281,10 +385,21 @@ def psi_at_t(date, shot_in_the_date, m):
 
 
 
-def psi_plot(date, shot_in_the_date, save=True, renewal=False):
+def psi_plot(date, shot_in_the_date, save=True, renewal=False, start=450, stop=490, lvs=200, psi_lim=[-10e-3, 10e-3]):
     '''
     this function only takes date and shot in the date as input
     and returns the psi plot
+
+    input:
+    ------
+    date: the date at which the experiment is done
+    shot_in_the_date: the shot number of the experiment within the date
+    save: whether to save the plot. Default value is true.
+    renewal: whether to renew the experiment log or the calibration log. Default is False,
+             accepted values are 'exp', 'cali', and 'both'
+    start: the start time of plotting 
+    stop: the stop time of plotting
+    lvs: the number of levels of the contourf plot of the magnetic lines
     '''
 
     if renewal:
@@ -294,24 +409,25 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False):
     
     R_interp, Z_interp = RZ_mesh()
 
-    times_to_plot = np.linspace(450, 490, 9, dtype=int)
+    times_to_plot = np.linspace(start, stop, 9, dtype=int)
     
 
     fig, ax = plt.subplots(3, 3, figsize=[6, 6])
     fig.subplots_adjust(hspace=0.3)
-    
-    levels = np.linspace(-10e-3, 10e-3, 90)
+
+    psi_upper, psi_lower = psi_lim
+    levels = np.linspace(psi_upper, psi_lower, lvs)
     
 
     for idx, t in enumerate(times_to_plot):
         
             i, k = [idx//3, idx%3]
-    
-            CS = ax[i, k].contourf(R_interp[:, 1:], Z_interp[:, 1:], psi_at_t(date, shot_in_the_date, t).T, 30, cmap='pink', levels=levels)
-            ax[i, k].contour(CS, levels=CS.levels[1:-1:3], colors='k')
-            ax[i, k].set_title(r'%i $\mu s$' %t)
+            # in python, array indexing begins from 0
+            CS = ax[i, k].contourf(R_interp[:, 1:], Z_interp[:, 1:], psi_at_t(date, shot_in_the_date, t-1).T, cmap='pink', levels=levels)
+            ax[i, k].contour(CS, levels=CS.levels[0:-1:5], colors='k')
+            ax[i, k].set_title(r'%i $\mu s$' %(t))
 
-            # ax[i, k].plot(np.arange(0, 7) * 25e-3 + 9e-2, np.ones(7) * -2.1e-2, 'x', c='darkred', ms=4)
+            # ax[i, k].plot(np.arange(0, 7) * 25e-3 + 9e-2, np.ones(7) * 2.1e-2, 'x', c='pinks', ms=4)
     
             if k!=0:
                 ax[i, k].tick_params(labelleft=False)
@@ -335,11 +451,58 @@ def psi_plot(date, shot_in_the_date, save=True, renewal=False):
 
 
     if save:
-        fig.savefig('./%s/shot%s-9psi.jpg' %(date, shot_in_the_date), dpi=600)
-
+        try:
+            fig.savefig('./shot_fig/%s-shot%s-9psi.jpg' %(date, shot_in_the_date), dpi=600)
+        except FileNotFoundError:
+            os.mkdir('./shot_fig/')
+            fig.savefig('./shot_fig/%s-shot%s-9psi.jpg' %(date, shot_in_the_date), dpi=600)
 
     plt.show()
 
+
+
+
+
+def Bz_and_channel_check(date, shot_in_the_date, renewal='cali', t=470, lvs=200, psi_lim=[-10e-3, 10e-3], bz_lim=[-0.12, 0.12]):
+    '''
+    this function plot psi lines together with filled contour of Bz in order to check if there is any dead channels
+    '''
+    if renewal:     
+        log_renewal(renewal)
+
+    R_interp, Z_interp = RZ_mesh()
+
+    fig, ax = plt.subplots()
+
+    ax.set_aspect('equal', 'box')
+
+    psi_lower, psi_upper = psi_lim
+    levels = np.linspace(psi_lower, psi_upper, lvs)
+
+    bz_lower, bz_upper = bz_lim
+
+    ax.contour(R_interp[:, 1:], Z_interp[:, 1:], psi_at_t(date, shot_in_the_date, t-1).T, levels=levels[0:-1:5], colors='k')
+    cf = ax.contourf(R_interp, Z_interp, Bz_at_t(date, shot_in_the_date, t-1).T, cmap='RdBu_r', levels=np.linspace(bz_lower, bz_upper, 101))
+
+
+    # r, z = RZ_coordinate()
+    # ax.plot(r, z, 'rx')
+    calidata_alivez = cali_data.query('direction=="z" and ok!=0 and dtacq_num==39')
+
+    for _, row in calidata_alivez.iterrows():
+        ax.plot(row.rpos, row.zpos, 'rx')
+        ax.text(row.rpos, row.zpos, '%s' %row.dtacq_ch, fontsize=10, color='midnightblue')
+
+
+    ax.set_title(r'%i $\mu s$' %t)
+
+    ax.set_xlabel('R[m]')
+    ax.set_ylabel('Z[m]')
+
+    cbar = fig.colorbar(cf, ax=ax, shrink=0.6)
+
+    plt.show()
+    
 
 
 
